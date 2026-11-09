@@ -2,42 +2,22 @@
 
 ## Ta manette @showdialog
 
-Ton micro:bit devient la manette de ton jeu d'arcade. D'abord, il envoie tes gestes : tu l'inclines pour monter et descendre, tu appuies sur A pour tirer.
+Ton micro:bit devient la manette de ton jeu d'arcade. D'abord, avec les seuils que tu as notés, il envoie tes gestes : tu l'inclines pour monter et descendre, tu appuies sur A pour tirer.
 
 Ensuite, il écoute ton jeu : un son et une icône quand tu détruis un ennemi ou quand tu es touché, et tes vies qui s'affichent.
 
-## Regarde ton accéléromètre
-
-Avant de choisir quand ta manette monte ou descend, regarde les nombres que donne son accéléromètre.
-
-- :mouse pointer: Dans le ``||basic(noclick):toujours||`` déjà présent, mets ``||serial:série écrire valeur "y" = ||`` avec ``||input:accélération (mg) y||`` de ``||input:Entrées||``. Les blocs ``||serial:série||`` sont dans **Avancé**.
-- :mouse pointer: Clique sur **Télécharger**, garde le câble branché, puis clique sur **Afficher données Appareil**.
-- :mouse pointer: Incline ta manette vers l'avant, puis vers l'arrière. Note la valeur de **y** à partir de laquelle elle est vraiment penchée.
-
-Ta manette envoie ses mesures par la **liaison série**. C'est par elle aussi qu'elle parlera au jeu.
-
-```blockconfig.local
-serial.writeValue("y", input.acceleration(Dimension.Y))
-```
-
-```blocks
-basic.forever(function () {
-    // @highlight
-    serial.writeValue("y", input.acceleration(Dimension.Y))
-})
-```
-
 ## Monter et descendre
 
-Ta manette envoie **haut** quand tu l'inclines vers l'avant, **bas** vers l'arrière.
+Ta manette envoie **haut** quand tu l'inclines vers l'avant, **bas** vers l'arrière. Garde sous la main les seuils que tu as notés.
 
-- :mouse pointer: Dans le ``||basic(noclick):toujours||``, remplace ``||serial:série écrire valeur||`` par un ``||logic:si alors sinon si alors||`` de ``||logic:Logique||``.
-- :mouse pointer: Conditions : ``||input:accélération (mg) y||`` plus petite que ton seuil avant, puis plus grande que ton seuil arrière.
-- :mouse pointer: Dans chaque branche, ``||serial:série écrire ligne||`` avec **haut**, puis **bas**.
-
-Mets les seuils que tu as notés : ici, -300 et 300.
+- :mouse pointer: Dans le ``||basic(noclick):toujours||`` déjà présent, mets ``||logic:si alors sinon si alors||`` de ``||logic:Logique||``.
+- :mouse pointer: Dans chaque condition, mets le bloc de comparaison ``||logic:0 < 0||`` de ``||logic:Logique||`` : à gauche ``||input:accélération (mg) y||`` de ``||input:Entrées||``, à droite ton seuil. Choisis le signe < pour l'avant, > pour l'arrière.
+- :mouse pointer: Dans chaque branche, ``||serial:série écrire ligne||``, dans **Avancé**, ``||serial:Communication série||`` : **haut**, puis **bas**.
 
 ```blockconfig.local
+if (true) {
+} else if (true) {
+}
 serial.writeLine("haut")
 ```
 
@@ -52,19 +32,43 @@ basic.forever(function () {
 })
 ```
 
+## Un mot toutes les 20 ms
+
+Sans pause, ta manette enverrait des milliers de mots par seconde et noierait la liaison série.
+
+- :mouse pointer: À la fin du ``||basic(noclick):toujours||``, ajoute ``||basic:pause (ms) 20||`` de ``||basic:Base||``.
+
+Avec la pause, ta manette envoie 50 mots par seconde : assez pour que ton héros bouge sans à-coups.
+
+```blockconfig.local
+basic.pause(20)
+```
+
+```blocks
+basic.forever(function () {
+    if (input.acceleration(Dimension.Y) < -300) {
+        serial.writeLine("haut")
+    } else if (input.acceleration(Dimension.Y) > 300) {
+        serial.writeLine("bas")
+    }
+    // @highlight
+    basic.pause(20)
+})
+```
+
 ## Tirer
 
 Ta manette envoie **A** quand tu appuies sur son bouton A.
 
-- :mouse pointer: Dans le même ``||basic(noclick):toujours||``, sous le premier **si**, ajoute ``||logic:si alors||``.
-- :mouse pointer: Condition : ``||input:bouton A est pressé||``. Dans la branche : ``||serial:série écrire ligne||`` avec **A**.
-- :mouse pointer: À la fin du **toujours**, ajoute ``||basic:pause (ms) 20||``.
+- :mouse pointer: Avant la pause, ajoute ``||logic:si alors||``, avec ``||input:bouton A est pressé||`` de ``||input:Entrées||``.
+- :mouse pointer: Dans la branche : ``||serial:série écrire ligne||`` avec **A**, en majuscule.
 
-Tant que tu tiens le bouton, la manette répète **A** toutes les 20 ms.
+La page relais attend exactement ces mots : **haut**, **bas** et **A**, au caractère près. **A** et **B** gardent la majuscule du nom des boutons.
 
 ```blockconfig.local
+if (input.buttonIsPressed(Button.A)) {
+}
 serial.writeLine("A")
-basic.pause(20)
 ```
 
 ```blocks
@@ -78,7 +82,6 @@ basic.forever(function () {
     if (input.buttonIsPressed(Button.A)) {
         serial.writeLine("A")
     }
-    // @highlight
     basic.pause(20)
 })
 ```
