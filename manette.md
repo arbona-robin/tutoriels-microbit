@@ -86,17 +86,9 @@ basic.forever(function () {
 })
 ```
 
-## Teste ta manette @showdialog
-
-Clique sur **Télécharger**. Puis clique sur **⋯** à côté de **Télécharger**, et sur **Déconnecter** : la liaison série est libre pour la page relais.
-
-Garde cet onglet ouvert. Va jouer avec ta manette (page de la séance, étape 2), puis fais parler ton jeu à ta manette (étape 3).
-
-Reviens ensuite ici : ta manette va apprendre à écouter ton jeu.
-
 ## De la place pour recevoir
 
-Ton jeu envoie maintenant des mots à ta manette. Réserve-leur de la place.
+Ton jeu envoie des mots à ta manette. Réserve-leur de la place.
 
 - :mouse pointer: Dans **Avancé**, ``||serial:Communication série||``, glisse ``||serial:série définir taille tampon RX à 128||`` dans ``||basic(noclick):au démarrage||``.
 
@@ -197,8 +189,10 @@ basic.forever(function () {
 })
 ```
 
-## Rejoue @showdialog
+## Télécharge ta manette @showdialog
 
-Clique sur **Télécharger**, puis sur **⋯** et **Déconnecter**.
+Clique sur **Télécharger**.
 
-Rejoue avec ta manette dans la page relais : elle réagit maintenant à ton jeu.
+Puis **ferme cet onglet MakeCode** : tant qu'il est ouvert, il garde la liaison série avec ton micro:bit et vole des lettres aux mots de ta manette.
+
+Tu peux maintenant jouer avec ta manette, dans la page relais.
