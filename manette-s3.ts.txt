@@ -1,0 +1,24 @@
+serial.setRxBufferSize(128)
+basic.forever(function () {
+    if (input.acceleration(Dimension.Y) < -300) {
+        serial.writeLine("haut")
+    } else if (input.acceleration(Dimension.Y) > 300) {
+        serial.writeLine("bas")
+    }
+    if (input.buttonIsPressed(Button.A)) {
+        serial.writeLine("A")
+    }
+    basic.pause(20)
+})
+basic.forever(function () {
+    let mot = serial.readUntil(serial.delimiters(Delimiters.NewLine))
+    if (mot == "bien") {
+        music.play(music.tonePlayable(1319, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
+        basic.showIcon(IconNames.Yes)
+    } else if (mot == "mal") {
+        music.play(music.tonePlayable(131, music.beat(BeatFraction.Quarter)), music.PlaybackMode.InBackground)
+        basic.showIcon(IconNames.No)
+    } else {
+        basic.showString(mot)
+    }
+})
