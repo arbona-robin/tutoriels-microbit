@@ -1,6 +1,6 @@
 {
     "name": "tutoriels-microbit",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "Tutoriels MakeCode micro:bit en français pour le livre Maker Junior",
     "dependencies": {
         "core": "*"

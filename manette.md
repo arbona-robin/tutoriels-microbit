@@ -136,8 +136,7 @@ basic.forever(function () {
 
 Un son et une icône quand tu détruis un ennemi, ou quand tu es touché.
 
-- :mouse pointer: Sous **définir mot**, mets un ``||logic:si alors sinon si alors||``.
-- :mouse pointer: Conditions : ``||logic:mot = "bien"||``, puis ``||logic:mot = "mal"||``.
+- :mouse pointer: Sous **définir mot**, mets le bloc ``||logic:si mot = "bien" alors sinon si mot = "mal" alors||`` de ``||logic:Logique||`` : un seul bloc pour les deux mots.
 - :mouse pointer: Pour **bien** : ``||music:jouer tonalité 1319 Hz pour 1/16 temps en arrière-plan||`` et ``||basic:montrer l'icône||`` ✔.
 - :mouse pointer: Pour **mal** : une tonalité grave, pour 1/4 temps, et l'icône ✖.
 
@@ -146,6 +145,7 @@ Choisis tes sons et tes icônes : c'est ta manette.
 ```blockconfig.local
 let mot = ""
 if (mot == "bien") {
+} else if (mot == "mal") {
 }
 music.play(music.tonePlayable(1319, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
 ```
@@ -168,10 +168,10 @@ basic.forever(function () {
 
 Le jeu envoie aussi tes vies, un chiffre.
 
-- :mouse pointer: Clique sur le **+** du **si** pour ajouter un **sinon**.
+- :mouse pointer: Clique sur le **+** en bas du bloc **si mot = bien … sinon si mot = mal** pour ajouter un **sinon**.
 - :mouse pointer: Dedans, mets ``||basic:afficher texte||`` avec la variable **mot**.
 
-Tout mot qui n'est ni **bien** ni **mal** s'affiche : le chiffre de tes vies.
+Tout mot qui n'est ni **bien** ni **mal** s'affiche : le chiffre de tes vies. Si **mal** s'affiche en lettres, ton **sinon** n'est pas dans le même bloc que **mal**.
 
 ```blocks
 basic.forever(function () {
