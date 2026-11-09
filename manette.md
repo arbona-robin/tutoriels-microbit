@@ -24,8 +24,7 @@ serial.setRxBufferSize(128)
 
 Incline ta manette vers l'avant pour monter, vers l'arrière pour descendre.
 
-- :mouse pointer: Dans ``||basic:Base||``, sors un ``||basic:toujours||``.
-- :mouse pointer: Dedans, mets un ``||logic:si alors sinon si alors||`` de ``||logic:Logique||``.
+- :mouse pointer: Dans le ``||basic(noclick):toujours||`` déjà présent, mets un ``||logic:si alors sinon si alors||`` de ``||logic:Logique||``.
 - :mouse pointer: Conditions : ``||input:accélération (mg) y||`` de ``||input:Entrées||``, plus petite que **-300**, puis plus grande que **300**.
 - :mouse pointer: Dans chaque branche, ``||serial:série écrire ligne||`` avec **haut**, puis **bas**.
 
