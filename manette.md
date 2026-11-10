@@ -4,7 +4,7 @@
 
 Ton micro:bit devient la manette de ton jeu d'arcade. D'abord, avec les seuils que tu as notés, il envoie tes gestes : tu l'inclines pour monter et descendre, tu appuies sur A pour tirer.
 
-Ensuite, il écoute ton jeu : un son et une icône quand tu détruis un ennemi ou quand tu es touché, et tes vies qui s'affichent.
+Ensuite, il écoute ton jeu : un son quand tu tires, quand tu détruis un ennemi ou quand tu es touché, et tes vies sur son écran.
 
 ## Monter et descendre
 
@@ -132,60 +132,88 @@ basic.forever(function () {
 })
 ```
 
-## Bien et mal
+## Bip, bien et mal
 
-Un son et une icône quand tu détruis un ennemi, ou quand tu es touché.
+Un son quand tu tires, un autre quand tu détruis un ennemi, un troisième quand tu es touché.
 
-- :mouse pointer: Sous **définir mot**, mets le bloc ``||logic:si mot = "bien" alors sinon si mot = "mal" alors||`` de ``||logic:Logique||`` : un seul bloc pour les deux mots.
-- :mouse pointer: Pour **bien** : ``||music:jouer tonalité 1319 Hz pour 1/16 temps en arrière-plan||`` et ``||basic:montrer l'icône||`` ✔.
-- :mouse pointer: Pour **mal** : une tonalité grave, pour 1/4 temps, et l'icône ✖.
+- :mouse pointer: Sous **définir mot**, mets le bloc ``||logic:si mot = "bip" alors sinon si mot = "bien" alors sinon si mot = "mal" alors||`` de ``||logic:Logique||`` : un seul bloc pour les trois mots.
+- :mouse pointer: Dans chaque branche, ``||music:jouer tonalité pour 1/16 temps en arrière-plan||`` de ``||music:Musique||`` : **High G** pour **bip**, **High C** pour **bien**.
+- :mouse pointer: Pour **mal**, **Low C** pour **1/4** temps : un son grave, plus long.
 
-Choisis tes sons et tes icônes : c'est ta manette.
+**En arrière-plan** : le son se lance, et la boucle lit aussitôt le mot suivant. Choisis tes notes : c'est ta manette.
 
 ```blockconfig.local
 let mot = ""
-if (mot == "bien") {
+if (mot == "bip") {
+} else if (mot == "bien") {
 } else if (mot == "mal") {
 }
-music.play(music.tonePlayable(1319, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
+music.play(music.tonePlayable(Note.G5, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
 ```
 
 ```blocks
 basic.forever(function () {
     let mot = serial.readUntil(serial.delimiters(Delimiters.NewLine))
     // @highlight
-    if (mot == "bien") {
-        music.play(music.tonePlayable(1319, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
-        basic.showIcon(IconNames.Yes)
+    if (mot == "bip") {
+        music.play(music.tonePlayable(Note.G5, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
+    } else if (mot == "bien") {
+        music.play(music.tonePlayable(Note.C5, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
     } else if (mot == "mal") {
-        music.play(music.tonePlayable(131, music.beat(BeatFraction.Quarter)), music.PlaybackMode.InBackground)
-        basic.showIcon(IconNames.No)
+        music.play(music.tonePlayable(Note.C3, music.beat(BeatFraction.Quarter)), music.PlaybackMode.InBackground)
     }
 })
 ```
 
-## Tes vies
+## Le mot pour l'écran
 
-Le jeu envoie aussi tes vies, un chiffre.
+Tout autre mot, comme le chiffre de tes vies, est pour l'écran. La boucle d'écoute le range, sans l'afficher.
 
-- :mouse pointer: Clique sur le **+** en bas du bloc **si mot = bien … sinon si mot = mal** pour ajouter un **sinon**.
-- :mouse pointer: Dedans, mets ``||basic:afficher texte||`` avec la variable **mot**.
+- :mouse pointer: Clique sur le **+** en bas du bloc **si mot = bip …** pour ajouter un **sinon**.
+- :mouse pointer: Dans ``||variables:Variables||``, crée une variable **ecran**, et mets ``||variables:définir ecran à||`` dans le **sinon**, avec la variable **mot**.
 
-Tout mot qui n'est ni **bien** ni **mal** s'affiche : le chiffre de tes vies. Si **mal** s'affiche en lettres, ton **sinon** n'est pas dans le même bloc que **mal**.
+```blockconfig.local
+let mot = ""
+let ecran = mot
+```
 
 ```blocks
+let ecran = ""
 basic.forever(function () {
     let mot = serial.readUntil(serial.delimiters(Delimiters.NewLine))
-    if (mot == "bien") {
-        music.play(music.tonePlayable(1319, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
-        basic.showIcon(IconNames.Yes)
+    if (mot == "bip") {
+        music.play(music.tonePlayable(Note.G5, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
+    } else if (mot == "bien") {
+        music.play(music.tonePlayable(Note.C5, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
     } else if (mot == "mal") {
-        music.play(music.tonePlayable(131, music.beat(BeatFraction.Quarter)), music.PlaybackMode.InBackground)
-        basic.showIcon(IconNames.No)
+        music.play(music.tonePlayable(Note.C3, music.beat(BeatFraction.Quarter)), music.PlaybackMode.InBackground)
     } else {
         // @highlight
-        basic.showString(mot)
+        ecran = mot
     }
+})
+```
+
+## Affiche l'écran
+
+Une troisième boucle affiche le dernier mot reçu, en permanence.
+
+- :mouse pointer: Dans ``||basic:Base||``, sors un troisième ``||basic:toujours||``.
+- :mouse pointer: Dedans, mets ``||basic:afficher texte||`` avec la variable **ecran**.
+
+Afficher prend du temps : presque une seconde pour un chiffre. Dans la boucle d'écoute, ce serait une seconde sans écouter, et les sons arriveraient en retard, puis tous d'un coup. Une boucle par tâche : une envoie tes gestes, une écoute le jeu, une affiche.
+
+```blockconfig.local
+let ecran = ""
+basic.showString(ecran)
+```
+
+```blocks
+let ecran = ""
+// @highlight
+basic.forever(function () {
+    // @highlight
+    basic.showString(ecran)
 })
 ```
 

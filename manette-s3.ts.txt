@@ -1,3 +1,5 @@
+let mot = ""
+let ecran = ""
 serial.setRxBufferSize(128)
 basic.forever(function () {
     if (input.acceleration(Dimension.Y) < -300) {
@@ -11,14 +13,17 @@ basic.forever(function () {
     basic.pause(20)
 })
 basic.forever(function () {
-    let mot = serial.readUntil(serial.delimiters(Delimiters.NewLine))
-    if (mot == "bien") {
-        music.play(music.tonePlayable(1319, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
-        basic.showIcon(IconNames.Yes)
+    mot = serial.readUntil(serial.delimiters(Delimiters.NewLine))
+    if (mot == "bip") {
+        music.play(music.tonePlayable(Note.G5, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
+    } else if (mot == "bien") {
+        music.play(music.tonePlayable(Note.C5, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.InBackground)
     } else if (mot == "mal") {
-        music.play(music.tonePlayable(131, music.beat(BeatFraction.Quarter)), music.PlaybackMode.InBackground)
-        basic.showIcon(IconNames.No)
+        music.play(music.tonePlayable(Note.C3, music.beat(BeatFraction.Quarter)), music.PlaybackMode.InBackground)
     } else {
-        basic.showString(mot)
+        ecran = mot
     }
+})
+basic.forever(function () {
+    basic.showString(ecran)
 })
